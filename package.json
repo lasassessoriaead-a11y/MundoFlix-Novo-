@@ -1,0 +1,8 @@
+{
+  "name": "mundo-flix",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "telegram": "^2.26.22"
+  }
+}

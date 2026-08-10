@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f97316">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png">
+<title>Mundo Flix</title>
+<style>
+:root{--nav:#0f172a;--orange:#f97316;--bg:#f6f7fb;--line:#e5e7eb;--muted:#6b7280}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:#111827}
+.hidden{display:none!important}.login{min-height:100vh;display:grid;place-items:center;background:#0f172a;padding:18px}
+.loginbox{background:#fff;width:min(410px,100%);padding:26px;border-radius:20px}
+.brandlogo{width:52px;height:52px;border-radius:15px;background:#f97316;color:#fff;display:grid;place-items:center;font-size:24px}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;font:inherit}textarea{min-height:90px}
+label{font-size:13px;font-weight:750}.field{display:flex;flex-direction:column;gap:5px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.full{grid-column:1/-1}.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:800;cursor:pointer}.primary{background:var(--orange);color:white}.light{background:white;border:1px solid var(--line)}
+.app{display:flex;min-height:100vh}.side{width:230px;background:#0f172a;color:white;position:fixed;inset:0 auto 0 0;padding:18px 13px}
+.brand{font-size:19px;font-weight:900;padding:5px 7px 22px}.nav button{width:100%;text-align:left;background:none;border:0;color:#cbd5e1;padding:12px;border-radius:10px;margin:3px 0}
+.nav button.on,.nav button:hover{background:#1e293b;color:white}.main{margin-left:230px;padding:22px;width:calc(100% - 230px)}
+.page{display:none}.page.on{display:block}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:17px}
+h1{margin:0;font-size:25px}.sub{font-size:13px;color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:11px}
+.card{background:white;border:1px solid var(--line);border-radius:15px;padding:16px}.kpi{font-size:25px;font-weight:900;margin-top:5px}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+th,td{padding:11px;border-bottom:1px solid var(--line);font-size:13px;text-align:left}th{background:#f9fafb}
+.badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}.ok{background:#dcfce7;color:#166534}.wait{background:#ffedd5;color:#9a3412}.no{background:#fee2e2;color:#991b1b}
+.modal{position:fixed;inset:0;background:#0008;display:none;place-items:center;padding:15px;z-index:20}.modal.on{display:grid}.box{background:white;width:min(640px,96vw);max-height:92vh;overflow:auto;padding:20px;border-radius:18px}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}.notice{padding:13px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;font-size:13px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sp{height:12px}
+@media(max-width:900px){.side{width:70px}.side span{display:none}.main{margin-left:70px;width:calc(100% - 70px);padding:14px}.cards{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+@media(max-width:560px){.cards{grid-template-columns:1fr}.top{flex-direction:column;align-items:flex-start}table{display:block;overflow:auto}}
+</style>
+</head>
+<body>
+<div id="login" class="login">
+  <div class="loginbox">
+    <div class="brandlogo">▶</div><h1 style="margin-top:12px">Mundo Flix</h1>
+    <p class="sub">Entre com sua conta administrativa.</p>
+    <div class="field"><label>E-mail</label><input id="email" type="email" autocomplete="email"></div><div class="sp"></div>
+    <div class="field"><label>Senha</label><input id="password" type="password" autocomplete="current-password"></div>
+    <button class="btn primary" style="width:100%;margin-top:12px" onclick="signIn()">Entrar</button>
+    <button class="btn light" style="width:100%;margin-top:8px" onclick="signUp()">Criar minha conta</button>
+    <p id="loginMsg" class="sub"></p>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+<aside class="side"><div class="brand">▶ <span>Mundo Flix</span></div><div class="nav">
+<button class="on" data-p="dash">🏠 <span>Dashboard</span></button><button data-p="titles">🎬 <span>Títulos</span></button>
+<button data-p="telegram">✈️ <span>Telegram</span></button><button data-p="clients">👥 <span>Clientes</span></button>
+<button data-p="sales">💳 <span>Vendas</span></button><button onclick="signOut()">🚪 <span>Sair</span></button>
+</div></aside>
+<main class="main">
+<section id="dash" class="page on"><div class="top"><div><h1>Dashboard</h1><div class="sub">Dados salvos no Supabase</div></div><button class="btn primary" onclick="openM('titleModal')">+ Novo título</button></div>
+<div class="cards"><div class="card"><div class="sub">Títulos</div><div class="kpi" id="kTitles">0</div></div><div class="card"><div class="sub">Canais</div><div class="kpi" id="kChannels">0</div></div><div class="card"><div class="sub">Clientes</div><div class="kpi" id="kClients">0</div></div><div class="card"><div class="sub">Vendas pagas</div><div class="kpi" id="kPaid">0</div></div><div class="card"><div class="sub">Receita</div><div class="kpi" id="kRevenue">R$ 0</div></div></div>
+<div class="sp"></div><div class="card"><b>Fluxo</b><p class="sub">Cadastrar título → criar canal privado → publicar conteúdo → cliente → venda → pagamento → liberar acesso.</p></div></section>
+
+<section id="titles" class="page"><div class="top"><div><h1>Títulos</h1><div class="sub">Catálogo online</div></div><button class="btn primary" onclick="openM('titleModal')">+ Novo título</button></div><div id="titlesList"></div></section>
+<section id="telegram" class="page"><div class="top"><div><h1>Telegram</h1><div class="sub">Conecte uma ou mais contas</div></div><button class="btn primary" onclick="openTelegramConnect()">+ Adicionar conta</button></div>
+<div class="card"><div class="notice">Você pode conectar várias contas. O telefone, código e senha de 2 etapas são usados apenas durante a autorização e não ficam gravados. Depois da conexão, o sistema guarda somente a sessão autorizada protegida.</div></div><div class="sp"></div><div id="telegramAccounts"></div></section>
+<section id="clients" class="page"><div class="top"><div><h1>Clientes</h1><div class="sub">Compradores</div></div><button class="btn primary" onclick="openM('clientModal')">+ Novo cliente</button></div><div id="clientsList"></div></section>
+<section id="sales" class="page"><div class="top"><div><h1>Vendas</h1><div class="sub">Controle de pagamentos e acessos</div></div><button class="btn primary" onclick="openSale()">+ Nova venda</button></div><div id="salesList"></div></section>
+</main></div>
+
+<div id="titleModal" class="modal"><div class="box"><h2>Novo título</h2><div class="grid">
+<div class="field full"><label>Nome</label><input id="tName"></div><div class="field"><label>Tipo</label><select id="tType"><option>Filme</option><option>Minissérie</option><option>Dorama</option><option>Novela</option><option>Outro</option></select></div>
+<div class="field"><label>Preço</label><input id="tPrice" type="number" step=".01"></div><div class="field full"><label>Categoria</label><input id="tCategory"></div><div class="field full"><label>Sinopse</label><textarea id="tSynopsis"></textarea></div></div><div class="actions"><button class="btn light" onclick="closeM('titleModal')">Cancelar</button><button class="btn primary" onclick="saveTitle()">Salvar</button></div></div></div>
+
+<div id="clientModal" class="modal"><div class="box"><h2>Novo cliente</h2><div class="grid">
+<div class="field full"><label>Nome</label><input id="cName"></div><div class="field"><label>@Telegram</label><input id="cUser"></div><div class="field"><label>ID Telegram</label><input id="cTid"></div><div class="field full"><label>Telefone</label><input id="cPhone"></div></div><div class="actions"><button class="btn light" onclick="closeM('clientModal')">Cancelar</button><button class="btn primary" onclick="saveClient()">Salvar</button></div></div></div>
+
+
+<div id="telegramModal" class="modal"><div class="box"><h2>Conectar Telegram</h2>
+<div id="tgStepPhone"><div class="field"><label>Telefone com DDI</label><input id="tgPhone" placeholder="+55..." inputmode="tel"></div><div class="actions"><button class="btn light" onclick="closeTelegramConnect()">Cancelar</button><button class="btn primary" onclick="tgSendCode()">Enviar código</button></div></div>
+<div id="tgStepCode" class="hidden"><p class="sub">Digite o código recebido no Telegram.</p><div class="field"><label>Código</label><input id="tgCode" inputmode="numeric" autocomplete="one-time-code"></div><div class="actions"><button class="btn light" onclick="closeTelegramConnect()">Cancelar</button><button class="btn primary" onclick="tgVerifyCode()">Confirmar código</button></div></div>
+<div id="tgStepPassword" class="hidden"><p class="sub">Esta conta usa verificação em duas etapas.</p><div class="field"><label>Senha do Telegram</label><input id="tgPassword" type="password"></div><div class="actions"><button class="btn light" onclick="closeTelegramConnect()">Cancelar</button><button class="btn primary" onclick="tgVerifyPassword()">Conectar conta</button></div></div>
+<p id="tgMsg" class="sub"></p></div></div>
+<div id="saleModal" class="modal"><div class="box"><h2>Nova venda</h2><div class="grid">
+<div class="field full"><label>Título</label><select id="sTitle"></select></div><div class="field full"><label>Cliente</label><select id="sClient"></select></div><div class="field full"><label>Valor</label><input id="sAmount" type="number" step=".01"></div></div><div class="actions"><button class="btn light" onclick="closeM('saleModal')">Cancelar</button><button class="btn primary" onclick="saveSale()">Registrar</button></div></div></div>
+
+<script src="config.js"></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const cfg=window.MUNDO_FLIX_CONFIG;
+const sb=createClient(cfg.supabaseUrl,cfg.supabaseKey);
+window.sb=sb;
+let titles=[],clients=[],sales=[];
+const $=id=>document.getElementById(id);
+const money=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',');
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+window.openM=id=>$(id).classList.add('on'); window.closeM=id=>$(id).classList.remove('on');
+
+async function boot(){
+ const {data:{session}}=await sb.auth.getSession();
+ if(session){showApp();await refresh()} else showLogin();
+}
+function showLogin(){$('login').classList.remove('hidden');$('app').classList.add('hidden')}
+function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden')}
+window.signIn=async()=>{loginMsg.textContent='Entrando...';const {error}=await sb.auth.signInWithPassword({email:email.value.trim(),password:password.value});if(error){loginMsg.textContent=error.message;return}showApp();await refresh()}
+window.signUp=async()=>{loginMsg.textContent='Criando conta...';const {data,error}=await sb.auth.signUp({email:email.value.trim(),password:password.value});if(error){loginMsg.textContent=error.message;return}loginMsg.textContent=data.session?'Conta criada e conectada.':'Conta criada. Se o Supabase pedir confirmação por e-mail, confirme e depois entre.';if(data.session){showApp();await refresh()}}
+window.signOut=async()=>{await sb.auth.signOut();showLogin()}
+
+document.querySelectorAll('.nav button[data-p]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));$(b.dataset.p).classList.add('on')});
+
+async function refresh(){await Promise.all([loadTitles(),loadClients(),loadSales(),loadTelegramAccounts()]);renderDash()}
+async function loadTitles(){const {data,error}=await sb.from('titles').select('*').order('created_at',{ascending:false});if(error)return fail(error);titles=data||[];titlesList.innerHTML=titles.length?`<table><thead><tr><th>Título</th><th>Preço</th><th>Telegram</th><th></th></tr></thead><tbody>${titles.map(t=>`<tr><td><b>${esc(t.name)}</b><div class="sub">${esc(t.content_type)} • ${esc(t.category||'Sem categoria')}</div></td><td>${money(t.price)}</td><td>${t.telegram_status==='created'?'<span class="badge ok">Canal criado</span>':'<span class="badge wait">Pendente</span>'}</td><td><button class="btn light" onclick="removeTitle('${t.id}')">Excluir</button></td></tr>`).join('')}</tbody></table>`:'<div class="card">Nenhum título cadastrado.</div>'}
+async function loadClients(){const {data,error}=await sb.from('clients').select('*').order('created_at',{ascending:false});if(error)return fail(error);clients=data||[];clientsList.innerHTML=clients.length?`<table><thead><tr><th>Cliente</th><th>Telegram</th><th>Telefone</th></tr></thead><tbody>${clients.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.telegram_username||c.telegram_user_id||'—')}</td><td>${esc(c.phone||'—')}</td></tr>`).join('')}</tbody></table>`:'<div class="card">Nenhum cliente cadastrado.</div>'}
+async function loadSales(){const {data,error}=await sb.from('sales').select('*, titles(name), clients(name)').order('created_at',{ascending:false});if(error)return fail(error);sales=data||[];salesList.innerHTML=sales.length?`<table><thead><tr><th>Título</th><th>Cliente</th><th>Valor</th><th>Pagamento</th><th>Acesso</th></tr></thead><tbody>${sales.map(s=>`<tr><td>${esc(s.titles?.name||'')}</td><td>${esc(s.clients?.name||'')}</td><td>${money(s.amount)}</td><td>${s.payment_status==='paid'?'<span class="badge ok">Pago</span>':'<span class="badge wait">'+esc(s.payment_status)+'</span>'}</td><td>${esc(s.access_status)}</td></tr>`).join('')}</tbody></table>`:'<div class="card">Nenhuma venda registrada.</div>'}
+function renderDash(){kTitles.textContent=titles.length;kChannels.textContent=titles.filter(t=>t.telegram_status==='created').length;kClients.textContent=clients.length;kPaid.textContent=sales.filter(s=>s.payment_status==='paid').length;kRevenue.textContent=money(sales.filter(s=>s.payment_status==='paid').reduce((a,s)=>a+Number(s.amount||0),0))}
+window.saveTitle=async()=>{const {error}=await sb.from('titles').insert({name:tName.value.trim(),content_type:tType.value,price:Number(tPrice.value||0),category:tCategory.value.trim(),synopsis:tSynopsis.value.trim()});if(error)return alert(error.message);closeM('titleModal');tName.value=tPrice.value=tCategory.value=tSynopsis.value='';await refresh()}
+window.removeTitle=async id=>{if(!confirm('Excluir este título?'))return;const {error}=await sb.from('titles').delete().eq('id',id);if(error)return alert(error.message);await refresh()}
+window.saveClient=async()=>{const {error}=await sb.from('clients').insert({name:cName.value.trim(),telegram_username:cUser.value.trim(),telegram_user_id:cTid.value.trim(),phone:cPhone.value.trim()});if(error)return alert(error.message);closeM('clientModal');cName.value=cUser.value=cTid.value=cPhone.value='';await refresh()}
+window.openSale=()=>{if(!titles.length||!clients.length)return alert('Cadastre um título e um cliente primeiro.');sTitle.innerHTML=titles.map(t=>`<option value="${t.id}" data-price="${t.price}">${esc(t.name)}</option>`).join('');sClient.innerHTML=clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');sAmount.value=titles[0].price;sTitle.onchange=()=>sAmount.value=sTitle.selectedOptions[0].dataset.price;openM('saleModal')}
+window.saveSale=async()=>{const {error}=await sb.from('sales').insert({title_id:sTitle.value,client_id:sClient.value,amount:Number(sAmount.value||0)});if(error)return alert(error.message);closeM('saleModal');await refresh()}
+function fail(e){console.error(e);if((e.message||'').toLowerCase().includes('row-level security')) alert('Esta conta não tem permissão para acessar o Mundo Flix.');}
+
+let tgAuthToken=null;
+async function authFetch(url,body){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session) throw new Error("Sua sessão do Mundo Flix expirou. Entre novamente.");
+  const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify(body||{})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error||"Erro ao conectar Telegram.");
+  return j;
+}
+window.openTelegramConnect=()=>{tgAuthToken=null;tgPhone.value=tgCode.value=tgPassword.value='';tgMsg.textContent='';tgStepPhone.classList.remove('hidden');tgStepCode.classList.add('hidden');tgStepPassword.classList.add('hidden');openM('telegramModal')}
+window.closeTelegramConnect=()=>closeM('telegramModal');
+window.tgSendCode=async()=>{try{tgMsg.textContent='Enviando código...';const j=await authFetch('/api/telegram/send-code',{phone:tgPhone.value.trim()});tgAuthToken=j.authToken;tgPhone.value='';tgStepPhone.classList.add('hidden');tgStepCode.classList.remove('hidden');tgMsg.textContent='Código enviado.'}catch(e){tgMsg.textContent=e.message}}
+window.tgVerifyCode=async()=>{try{tgMsg.textContent='Verificando...';const j=await authFetch('/api/telegram/verify-code',{authToken:tgAuthToken,code:tgCode.value.trim()});tgCode.value='';if(j.needsPassword){tgAuthToken=j.authToken;tgStepCode.classList.add('hidden');tgStepPassword.classList.remove('hidden');tgMsg.textContent='Digite a senha de 2 etapas.';return}tgMsg.textContent='Conta conectada.';setTimeout(()=>{closeTelegramConnect();loadTelegramAccounts()},500)}catch(e){tgMsg.textContent=e.message}}
+window.tgVerifyPassword=async()=>{try{tgMsg.textContent='Conectando...';await authFetch('/api/telegram/password',{authToken:tgAuthToken,password:tgPassword.value});tgPassword.value='';tgMsg.textContent='Conta conectada.';setTimeout(()=>{closeTelegramConnect();loadTelegramAccounts()},500)}catch(e){tgMsg.textContent=e.message}}
+async function loadTelegramAccounts(){
+  const {data,error}=await sb.from('telegram_accounts').select('id,label,telegram_user_id,username,display_name,status,connected_at').order('connected_at',{ascending:false});
+  if(error){telegramAccounts.innerHTML='<div class="card"><span class="badge no">Não foi possível carregar as contas.</span></div>';return}
+  telegramAccounts.innerHTML=(data||[]).length?`<div class="cards">${data.map(a=>`<div class="card"><div class="row"><b>${esc(a.display_name||'Conta Telegram')}</b>${a.status==='connected'?'<span class="badge ok">Conectada</span>':'<span class="badge wait">'+esc(a.status)+'</span>'}</div><div class="sub">${a.username?'@'+esc(a.username):'ID '+esc(a.telegram_user_id)}</div>${a.status==='connected'?`<button class="btn light" style="margin-top:10px" onclick="tgDisconnect('${a.id}')">Desconectar</button>`:''}</div>`).join('')}</div>`:'<div class="card">Nenhuma conta do Telegram conectada.</div>';
+}
+window.tgDisconnect=async id=>{if(!confirm('Desconectar esta conta do Mundo Flix?'))return;try{await authFetch('/api/telegram/disconnect',{id});await loadTelegramAccounts()}catch(e){alert(e.message)}}
+
+sb.auth.onAuthStateChange((_e,session)=>{if(!session)showLogin()});
+boot();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body></html>
